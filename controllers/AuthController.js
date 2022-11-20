@@ -2,6 +2,7 @@ import express from "express";
 import {UserService} from '../services/UserService.js'
 import {validator} from "../utils/JoiValidationUtil.js";
 import {AuthSendValidationSmsSchema} from "../JoiSchemas/AuthSendValidationSmsSchema.js";
+import ApiMessage from "../utils/ApiMessage.js";
 
 const AuthController = new express.Router()
 
@@ -14,16 +15,16 @@ AuthController.post('/send-validation-sms',
             if (type === 'newUser') {
                 let user = await UserService.getUserByPhoneNumber(phoneNumber)
                 if (user) {
-                    return res.status(400).send({message: 'شما قبلا ثبت نام کرده اید'})
+                    return res.status(400).send(new ApiMessage({message: 'شما قبلا ثبت نام کرده اید'}))
                 }
-                user =  await UserService.createUser({phoneNumber})
+                user = await UserService.createUser({phoneNumber})
                 res.send(user)
             } else {
                 res.send({})
             }
 
         } catch (e) {
-            res.status(400).send({message: 'Bad Request'})
+            res.status(400).send(new ApiMessage({message: 'Bad Request'}))
         }
     })
 
