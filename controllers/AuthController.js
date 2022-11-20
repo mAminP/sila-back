@@ -2,17 +2,30 @@ import express from "express";
 import {UserService} from '../services/UserService.js'
 import {validator} from "../utils/JoiValidationUtil.js";
 import {AuthSendValidationSmsSchema} from "../JoiSchemas/AuthSendValidationSmsSchema.js";
-const AuthController = new express.Router()
 
+const AuthController = new express.Router()
 
 
 AuthController.post('/send-validation-sms',
     validator.body(AuthSendValidationSmsSchema),
-    async (req,res)=> {
+    async (req, res) => {
+        try {
+            const {phoneNumber, type} = req.body
+            if (type === 'newUser') {
+                let user = await UserService.getUserByPhoneNumber(phoneNumber)
+                if (user) {
+                    return res.status(400).send({message: 'شما قبلا ثبت نام کرده اید'})
+                }
+                user =  await UserService.createUser({phoneNumber})
+                res.send(user)
+            } else {
+                res.send({})
+            }
 
-    return res.send({...req.body})
-})
-
+        } catch (e) {
+            res.status(400).send({message: 'Bad Request'})
+        }
+    })
 
 
 export default AuthController
