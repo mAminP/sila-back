@@ -1,6 +1,6 @@
-import todosRoute from './src/todos/routes.js'
+import AuthController from "./controllers/AuthController.js";
 
 
 export default function (app){
-    app.use('/todos',todosRoute)
+    app.use('/auth',AuthController)
 }
