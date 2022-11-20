@@ -11,8 +11,8 @@ async function run() {
         app.listen(port)
         console.log(` app listening on localhost:${port}`)
 
-       // const res =  await sendSms("09146672256","Amin")
-       //  console.log(res)
+       const res =  await sendSms("09359669336","Amin")
+        console.log(res)
     } catch (e) {
         console.log('[ERROR]',e)
     }
