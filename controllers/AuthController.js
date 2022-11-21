@@ -5,49 +5,11 @@ import {validator} from "../utils/JoiValidationUtil.js";
 import {AuthSendValidationSmsSchema} from "../JoiSchemas/AuthSendValidationSmsSchema.js";
 import ApiMessage from "../utils/ApiMessage.js";
 import {AuthRegisterSchema} from "../JoiSchemas/AuthRegisterSchema.js";
-import {sendValidationCodeSms} from "../utils/SmsUtil.js";
+import {sendValidationCodeSms, validateSentCode} from "../utils/SmsUtil.js";
+import {AuthValidateSmsCodeSchema} from "../JoiSchemas/AuthValidateSmsCodeSchema.js";
 
 
 const AuthController = new express.Router()
-/**
- * @swagger
- * components:
- *   schemas:
- *    ValidationInput:
- *      type: object
- *      required: true
- *          - phoneNumber
- *          - type
- *      properties:
- *          phoneNumber:
- *            type: string
- *            description: The auto-generated id of the book
- *          type:
- *            type: string
- *            description: The book title
- *      example:
- *            phoneNumber: "9359669336"
- *            type: "newUser"
- */
-
-
-
-/**
- * @swagger
- * /auth/send-validation-sms:
- *   post:
- *     summary: send sms validation code
- *     tags: [Auth]
- *     produces:
- *        - application/json
- *     requestBody:
- *         required: true
- *         content:
- *           application/json:
- *             schema:
- *                $ref: '#/components/schemas/ValidationInput'
- */
-
 
 AuthController.post('/send-validation-sms',
     validator.body(AuthSendValidationSmsSchema),
@@ -72,6 +34,24 @@ AuthController.post('/send-validation-sms',
             res.status(400).send(new ApiMessage({message: 'Bad Request'}))
         }
     })
+
+AuthController.post('/validate-sms-code',
+    validator.body(AuthValidateSmsCodeSchema),
+    async (req, res) => {
+        try {
+            const {phoneNumber, code} = req.body
+                const result =  await validateSentCode(phoneNumber,code)
+                if (!result){
+                    res.status(400).send(new ApiMessage({message: 'کد تایید صحیح نسیت'}))
+                }
+                res.send(new ApiMessage({message: `کد تایید صحیح است`}))
+
+
+        } catch (e) {
+            res.status(400).send(new ApiMessage({message: 'Bad Request'}))
+        }
+    })
+
 
 
 AuthController.post('/register',
