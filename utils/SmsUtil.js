@@ -5,7 +5,7 @@ const client = new MelipayamakApi(process.env.MELLIPAYAMAK_SMS_USERNAME, process
 const sms = client.sms();
 
 async function sendSms(phoneNumber, text) {
-    return await sms.send(phoneNumber,30001230669336, text)
+    return await sms.send(phoneNumber,process.env.MELLIPAYAMAK_SMS_NUMBER, text)
 }
 
 export {
