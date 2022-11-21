@@ -24,6 +24,9 @@
     "kavenegar": "^1.1.4",
     "melipayamak": "^1.0.5",
     "mongoose": "^6.7.2",
-    "trez-sms-client": "^1.0.4"
+    "swagger-jsdoc": "^6.2.5",
+    "swagger-ui-express": "^4.6.0",
+    "trez-sms-client": "^1.0.4",
+    "uuid": "^9.0.0"
   }
 }
