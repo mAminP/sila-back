@@ -8,6 +8,7 @@ import {AuthRegisterSchema} from "../JoiSchemas/AuthRegisterSchema.js";
 import {sendValidationCodeSms, validateSentCode} from "../utils/SmsUtil.js";
 import {AuthValidateSmsCodeSchema} from "../JoiSchemas/AuthValidateSmsCodeSchema.js";
 import {AuthLoginSchema} from "../JoiSchemas/AuthLoginSchema.js";
+import {auth} from "../middlewares/auth.js";
 
 
 const AuthController = new express.Router()
@@ -86,7 +87,26 @@ AuthController.post('/login',
             if (!passwordCheck){
                 return res.status(400).send(new ApiMessage({message: 'شماره موبایل یا رمز عبور نادرست است'}))
             }
-            res.send(user)
+            const token = await UserService.generateToken(user)
+            res.send({token})
+        } catch (e) {
+            res.status(400).send(new ApiMessage({message: 'Bad Request'}))
+        }
+    })
+
+
+AuthController.get('/me',
+    auth(),
+    async (req, res) => {
+        try {
+            const {_id,role,firstName,lastName} = req.user
+
+            res.send({
+                _id,
+                role,
+                firstName,
+                lastName
+            })
         } catch (e) {
             res.status(400).send(new ApiMessage({message: 'Bad Request'}))
         }

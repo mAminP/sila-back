@@ -4,6 +4,7 @@ dotenv.config()
 
 export const $config = {
     SITE_NAME:"چرم سیلا",
+    TOKEN_SECRET:process.env.TOKEN_SECRET,
     PORT:process.env.PORT,
     DB_URI:process.env.DB_URI,
     MELLIPAYAMAK_SMS_USERNAME:process.env.MELLIPAYAMAK_SMS_USERNAME,
