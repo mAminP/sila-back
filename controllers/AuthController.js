@@ -1,4 +1,4 @@
-'use strict';
+
 import express from "express";
 import {UserService} from '../services/UserService.js'
 import {validator} from "../utils/JoiValidationUtil.js";
@@ -7,6 +7,7 @@ import ApiMessage from "../utils/ApiMessage.js";
 import {AuthRegisterSchema} from "../JoiSchemas/AuthRegisterSchema.js";
 import {sendValidationCodeSms, validateSentCode} from "../utils/SmsUtil.js";
 import {AuthValidateSmsCodeSchema} from "../JoiSchemas/AuthValidateSmsCodeSchema.js";
+import {AuthLoginSchema} from "../JoiSchemas/AuthLoginSchema.js";
 
 
 const AuthController = new express.Router()
@@ -71,6 +72,25 @@ AuthController.post('/register',
         }
     })
 
+
+AuthController.post('/login',
+    validator.body(AuthLoginSchema),
+    async (req, res) => {
+        try {
+            const {phoneNumber,password} = req.body
+            let user = await UserService.getUserByPhoneNumber(phoneNumber).populate({path: "passwordHash"}).populate({path: "role"})
+            if (!user) {
+                return res.status(400).send(new ApiMessage({message: 'شماره موبایل یا رمز عبور نادرست است'}))
+            }
+            const passwordCheck= await UserService.checkPassword(password,user.passwordHash)
+            if (!passwordCheck){
+                return res.status(400).send(new ApiMessage({message: 'شماره موبایل یا رمز عبور نادرست است'}))
+            }
+            res.send(user)
+        } catch (e) {
+            res.status(400).send(new ApiMessage({message: 'Bad Request'}))
+        }
+    })
 
 
 
