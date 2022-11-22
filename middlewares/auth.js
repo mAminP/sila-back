@@ -9,7 +9,7 @@ export  const auth =(role)=>async (req, res, next) => {
     const authHeader = req.headers['authorization']
     const token = authHeader && authHeader.split(' ')[1]
 
-    if (token == null) return res.status(401).send()
+    if (token == null) return res.status(401).send(new ApiMessage({message:"require auth"}))
 
 
     let user = await jwt.verify(token, $config.TOKEN_SECRET);

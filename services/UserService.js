@@ -37,8 +37,8 @@ export const UserService = {
         return await bcrypt.compare(String(password), String(passwordHash))
     },
     async generateToken(user) {
-        const token = jwt.sign({_id: user._id, role: user.role}, $config.TOKEN_SECRET);
+        return await jwt.sign({_id: user._id, role: user.role}, $config.TOKEN_SECRET,{
 
-        return token
+        })
     }
 }
