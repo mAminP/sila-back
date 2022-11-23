@@ -11,4 +11,5 @@ UserController.get('/', auth("admin") ,async (req, res) => {
 })
 
 
+
 export default UserController
