@@ -8,3 +8,11 @@ export const ProductInputSchema = Joi.object().keys({
     images:Joi.array().items(Joi.objectId()),
 
 })
+export const ProductPriceInputSchema = Joi.object().keys({
+    price: Joi.number().required(),
+    discount: Joi.number()
+})
+
+export const ProductPriceParamsSchema = Joi.object().keys({
+    productId:Joi.objectId().required()
+})
