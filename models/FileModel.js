@@ -29,8 +29,7 @@ const FileSchema = new mongoose.Schema({
     })
 
 FileSchema.virtual('path').get(function () {
-    const fullUrl = app.request.protocol + '://' + app.request.get('host');
-    return `${fullUrl}/images/${this.name}`
+    return `${app.fullUrl}/images/${this.name}`
 })
 FileSchema.virtual('exists').get(function () {
     const path = './static/images/' + this.name
