@@ -8,7 +8,7 @@ import {AuthRegisterSchema} from "../JoiSchemas/AuthRegisterSchema.js";
 import {sendValidationCodeSms, validateSentCode} from "../utils/SmsUtil.js";
 import {AuthValidateSmsCodeSchema} from "../JoiSchemas/AuthValidateSmsCodeSchema.js";
 import {AuthLoginSchema} from "../JoiSchemas/AuthLoginSchema.js";
-import {auth} from "../middlewares/auth.js";
+import {auth} from "../middlewares/authMiddleware.js";
 
 
 const AuthController = new express.Router()
