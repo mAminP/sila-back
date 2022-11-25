@@ -2,24 +2,50 @@ import mongoose from "mongoose";
 
 
 const PriceSchema = new mongoose.Schema({
-    price: {
-        type: Number,
-        required: true,
+        price: {
+            type: Number,
+            required: true,
+        },
+        discount: {
+            type: Number,
+            required: false
+        },
+        product: {
+            type: mongoose.Types.ObjectId,
+            ref: 'Product'
+        },
+        color: [
+            {
+                name: {
+                    type: String,
+                    required: true
+                },
+                code: {
+                    type: String,
+                    required: true
+                }
+            }
+        ],
+        stock: {
+            type: Number,
+            required: true,
+        },
+        size: {
+            type: Number,
+            required: true
+        },
+        status: {
+            type: String,
+            enum: ["in-stock", "order", "done"],
+            required: true,
+            default: "in-stock"
+        }
     },
-    discount: {
-        type: Number,
-        required: false
-    },
-    product: {
-        type: mongoose.Types.ObjectId,
-        ref: 'Product'
-    },
-
-}, {
-    toObject: {virtuals: true},
-    toJSON: {virtuals: true},
-    timestamps: true
-})
+    {
+        toObject: {virtuals: true},
+        toJSON: {virtuals: true},
+        timestamps: true
+    })
 
 
 PriceSchema.virtual('off').get(function () {

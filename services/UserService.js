@@ -15,13 +15,11 @@ export const UserService = {
     getUserById(_id) {
         return UserModel.findOne({_id})
     },
-    async createUser({phoneNumber, firstName, lastName, passwordHash}) {
+    async createUser(passwordHash, body) {
         const user = new UserModel({
-            phoneNumber,
-            firstName,
-            lastName,
+            ...body,
             passwordHash,
-            role: 'user'
+            roles: ['user']
         })
 
         await user.save()
@@ -37,8 +35,6 @@ export const UserService = {
         return await bcrypt.compare(String(password), String(passwordHash))
     },
     async generateToken(user) {
-        return await jwt.sign({_id: user._id, role: user.role}, $config.TOKEN_SECRET,{
-
-        })
+        return await jwt.sign({_id: user._id, role: user.role}, $config.TOKEN_SECRET, {})
     }
 }

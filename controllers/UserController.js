@@ -5,7 +5,7 @@ import {auth} from "../middlewares/authMiddleware.js";
 const UserController = new express.Router()
 
 
-UserController.get('/', auth("admin") ,async (req, res) => {
+UserController.get('/', auth(["admin"]) ,async (req, res) => {
     const users = await UserService.getUsers()
     res.send(users)
 })

@@ -20,13 +20,15 @@ const UserSchema = new mongoose.Schema({
         required: true,
         select: false
     },
-    role: {
-        type: String,
-        enum: ['user', 'admin'],
-        default: 'user',
-        required: true,
-        select: false
-    }
+    roles: [
+        {
+            type: String,
+            enum: ['user', 'admin','marketer','seller'],
+            default: 'user',
+            required: true,
+            select: false
+        }
+    ]
 }, {timestamps: true})
 const UserModel = new mongoose.model('User', UserSchema)
 export {UserModel}

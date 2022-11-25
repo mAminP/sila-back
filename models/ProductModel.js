@@ -5,6 +5,18 @@ const ProductSchema = new mongoose.Schema({
             type: String,
             required: true
         },
+        code: {
+            type: String,
+            unique: true,
+            required: true
+        },
+        status: {
+            type: String,
+            enum: ["show", "suspended", "disable"],
+            required: true,
+            default: "suspended",
+            select: false
+        },
         description: {
             type: String,
             required: false
@@ -19,6 +31,12 @@ const ProductSchema = new mongoose.Schema({
             {
                 type: mongoose.Types.ObjectId,
                 ref: 'File'
+            }
+        ],
+        tags: [
+            {
+                type: String,
+                required: true
             }
         ],
     },
