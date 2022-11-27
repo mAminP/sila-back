@@ -1,4 +1,6 @@
 import mongoose from "mongoose";
+import {ColorSchema} from "./ColorSchema.js";
+
 
 const ProductSchema = new mongoose.Schema({
         title: {
@@ -9,6 +11,19 @@ const ProductSchema = new mongoose.Schema({
             type: String,
             unique: true,
             required: true
+        },
+        colors: [
+            [ // چند رنگ
+                {
+                    type: ColorSchema,
+                    required: true
+                }
+            ]
+        ],
+        sizes: {
+            type: [Number],
+            required: true,
+            index: true
         },
         status: {
             type: String,
@@ -46,10 +61,31 @@ const ProductSchema = new mongoose.Schema({
         timestamps: true
     }
 )
-
+ProductSchema.virtual('price', {
+    ref: 'Price',
+    localField: '_id',
+    foreignField: 'product',
+    justOne: true,
+    options:{
+        match: {
+            status: {
+                $in: ['in-stock', 'order']
+            }
+        },
+        sort:{
+            off: 1
+        }
+    }
+})
+;
 
 ProductSchema.virtual('prices', {
     ref: 'Price',
+    localField: '_id',
+    foreignField: 'product'
+});
+ProductSchema.virtual('wholesalePrices', {
+    ref: 'WholesalePrice',
     localField: '_id',
     foreignField: 'product'
 });

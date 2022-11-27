@@ -1,11 +1,18 @@
 import mongoose from "mongoose";
+import {ColorSchema} from "./ColorSchema.js";
 
 
 const PriceSchema = new mongoose.Schema({
+        buyPrice: {
+            type: Number,
+            required: true,
+            select: false
+        },
         price: {
             type: Number,
             required: true,
         },
+
         discount: {
             type: Number,
             required: false
@@ -16,14 +23,8 @@ const PriceSchema = new mongoose.Schema({
         },
         color: [
             {
-                name: {
-                    type: String,
-                    required: true
-                },
-                code: {
-                    type: String,
-                    required: true
-                }
+                type: ColorSchema,
+                required: true
             }
         ],
         stock: {
@@ -48,18 +49,21 @@ const PriceSchema = new mongoose.Schema({
     })
 
 
+PriceSchema.virtual('profit' )
+    .get(function () {
+        let discount = 0
+        if (this.discount) {
+            discount = 100 - ((this.discount * 100) / this.price)
+        }
+        const profit = Number((this.price * 100) / this.buyPrice) - 100
+        return +profit - +discount
+    })
+
 PriceSchema.virtual('off').get(function () {
     if (!this.discount) {
         return 0
     }
-    // price    15,000
-    // discount 13,500
-
-    // 15000    13500
-    // ------ = ------  =>  15000*x = 13500*100 => 13500*100/15000 = x
-    //  100       x
-
-    return 100 - Math.ceil((this.discount * 100) / this.price)
+    return 100 - Math.round((this.discount * 100) / this.price)
 })
 const PriceModel = new mongoose.model('Price', PriceSchema)
 

@@ -20,7 +20,7 @@ ProductController.get('/:productId',
     async (req, res) => {
         const product = await ProductService.getProductById(req.params.productId)
             .where({status: 'show'})
-            .lean()
+
         if (!product) {
             return res.status(404).send(new ApiMessage({
                 message: 'محصول یافت نشد'

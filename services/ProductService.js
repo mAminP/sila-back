@@ -8,12 +8,19 @@ export const ProductService = {
         return ProductModel
             .findOne({_id})
             .populate('images')
+            .populate('price')
             .populate({
-                path: 'prices', match: {
+                path: 'prices',
+
+                match: {
                     status: {
                         $in: ['in-stock', 'order']
                     }
-                }
+                },
+                // select:{
+                //     profit : false
+                // }
+
             })
             .populate({path: 'categories', populate: 'category'})
     },

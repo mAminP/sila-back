@@ -2,8 +2,8 @@ import mongoose from "mongoose";
 
 const CartSchema = new mongoose.Schema({
     count: {
-        type:Number,
-        required:true,
+        type: Number,
+        required: true,
         default: 1
     },
     product: {
@@ -11,21 +11,26 @@ const CartSchema = new mongoose.Schema({
         ref: 'Product',
         required: true,
     },
-    productPrice:{
+    productPrice: {
         type: mongoose.Types.ObjectId,
-        ref: 'ProductPrice',
-        required: true,
+        ref: 'Price',
+        required: false,
     },
-    order:{
-        type:mongoose.Types.ObjectId,
+    WholesalePrice: {
+        type: mongoose.Types.ObjectId,
+        ref: 'WholesalePrice',
+        required: false,
+    },
+    order: {
+        type: mongoose.Types.ObjectId,
         required: true,
         ref: 'Order'
     }
 
-},{
-    timestamps:true,
+}, {
+    timestamps: true,
 })
 
-const CartModel = new mongoose.model('Cart',CartSchema)
+const CartModel = new mongoose.model('Cart', CartSchema)
 
 export {CartModel}

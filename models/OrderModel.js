@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const OrderSchema = new mongoose.Schema({
     status: {
         type: String,
-        enum: ['in-order'],
+        enum: ['in-order','payed'],
         required:true,
         default: 'in-order'
     },
