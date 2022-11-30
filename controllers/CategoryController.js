@@ -1,5 +1,6 @@
 import express from "express";
 import {CategoryService} from "../services/CategoryService.js";
+import {auth} from "../middlewares/authMiddleware.js";
 
 const CategoryController = new express.Router()
 
@@ -10,12 +11,15 @@ CategoryController.get('/',
 
 
 CategoryController.post('/',
+    auth(['admin']),
     async (req, res) => {
         const {nameFa, nameEn, image} = req.body
         const category = await CategoryService.createCategory({nameFa, nameEn, image})
         res.send(category)
     })
 CategoryController.post('/:categoryId/category-child',
+
+    auth(['admin']),
     async (req, res) => {
         const {nameFa, nameEn, image} = req.body
         const {categoryId} = req.params

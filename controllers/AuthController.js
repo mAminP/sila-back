@@ -79,7 +79,7 @@ AuthController.post('/login',
     async (req, res) => {
         try {
             const {phoneNumber, password} = req.body
-            let user = await UserService.getUserByPhoneNumber(phoneNumber).populate({path: "passwordHash"}).populate({path: "role"})
+            let user = await UserService.getUserByPhoneNumber(phoneNumber).populate({path: "passwordHash"}).populate({path: "roles"})
             if (!user) {
                 return res.status(400).send(new ApiMessage({message: 'شماره موبایل یا رمز عبور نادرست است'}))
             }
