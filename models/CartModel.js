@@ -16,9 +16,9 @@ const CartSchema = new mongoose.Schema({
         ref: 'Price',
         required: false,
     },
-    WholesalePrice: {
+    productSerie:{
         type: mongoose.Types.ObjectId,
-        ref: 'WholesalePrice',
+        ref: 'Serie',
         required: false,
     },
     order: {

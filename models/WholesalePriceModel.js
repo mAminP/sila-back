@@ -3,6 +3,11 @@ import {ColorSchema} from "./ColorSchema.js";
 
 
 const WholesalePriceSchema = new mongoose.Schema({
+        buyPrice: {
+            type: Number,
+            required: true,
+            select: false
+        },
         price: {
             type: Number,
             required: true,
@@ -21,14 +26,15 @@ const WholesalePriceSchema = new mongoose.Schema({
                 required: true
             }
         ],
-        // stock: {
-        //     type: Number,
-        //     required: true,
-        // },
-        // size: {
-        //     type: Number,
-        //     required: true
-        // },
+        stock: {
+            type: Number,
+            required: true,
+            default: 0
+        },
+        size: {
+            type: Number,
+            required: true
+        },
         status: {
             type: String,
             enum: ["in-stock", "order", "done"],
@@ -42,18 +48,16 @@ const WholesalePriceSchema = new mongoose.Schema({
         timestamps: true
     })
 
+WholesalePriceSchema.virtual('serieWholesalePrices', {
+    ref: 'serieWholesalePrice',
+    localField: '_id',
+    foreignField: 'wholesalePrice'
+});
 
 WholesalePriceSchema.virtual('off').get(function () {
     if (!this.discount) {
         return 0
     }
-    // price    15,000
-    // discount 13,500
-
-    // 15000    13500
-    // ------ = ------  =>  15000*x = 13500*100 => 13500*100/15000 = x
-    //  100       x
-
     return 100 - Math.ceil((this.discount * 100) / this.price)
 })
 const WholesalePriceModel = new mongoose.model('WholesalePrice', WholesalePriceSchema)
