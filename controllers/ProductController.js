@@ -6,14 +6,49 @@ import {
     ProductPriceInputSchema,
 } from "../JoiSchemas/ProductInputSchema.js";
 import ApiMessage from "../utils/ApiMessage.js";
+import {ProductFilterQuerySchema} from "../JoiSchemas/ProductFilterQuerySchema.js";
+import {PaginateItems} from "../utils/PaginateItems.js";
+import {ProductModel} from "../models/ProductModel.js";
 
 const ProductController = express.Router()
 
 
-ProductController.get('/', async (req, res) => {
-    const products =await ProductService.getProducts().where({status: 'show'})
-    return  res.send(products)
-})
+ProductController.get('/',
+    validator.query(ProductFilterQuerySchema),
+    async (req, res) => {
+        const {page, limit, categories} = req.query
+
+        const aggregate = await ProductModel.aggregate()
+            .lookup({
+                from: 'prices', localField: '_id', foreignField: 'product', as: 'prices',
+
+                pipeline:[
+                    {
+                        $sort:{
+                            price: -1
+                        }
+                    }
+                ]
+            })
+        console.log({aggregate})
+        let query = ProductService.getProducts().where({status: 'show'})
+
+        if (categories) {
+            query = query.where({
+                categories: {
+                    $in: categories
+                }
+            })
+        }
+        query = query
+            .populate({path: 'categories', populate: 'category'})
+
+        const countQuery = ProductService.getProducts().merge(query)
+        const count = await countQuery.count()
+
+        const products = await query.skip((page - 1) * limit).limit(limit)
+        return res.send(new PaginateItems(page, limit, count, products))
+    })
 
 ProductController.get('/:productId',
     validator.params(ProductParamsSchema),
@@ -30,8 +65,15 @@ ProductController.get('/:productId',
     })
 
 ProductController.post('/', validator.body(ProductInputSchema), async (req, res) => {
-    const product = await ProductService.createProduct(req.body)
-    res.status(201).send(product)
+    try {
+        if (await ProductService.anyProductByCode(req.body.code)) {
+            return res.status(400).send(new ApiMessage({message: `محصول با شناسه ${req.body.code} قبلا ایجاد شده است.`}))
+        }
+        const product = await ProductService.createProduct(req.body)
+        res.status(201).send(product)
+    } catch (e) {
+        return res.status(400).send(new ApiMessage({message: 'متاسفانه خطایی رخ داد'}))
+    }
 })
 
 ProductController.post('/:productId/prices',

@@ -4,6 +4,11 @@ import ApiMessage from "../utils/ApiMessage.js";
 import {PriceModel} from "../models/PriceModel.js";
 
 export const ProductService = {
+
+    anyProductByCode(code){
+        return ProductModel.exists({code})
+    },
+
     getProductById(_id) {
         return ProductModel
             .findOne({_id})
