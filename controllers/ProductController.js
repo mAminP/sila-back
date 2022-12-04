@@ -18,19 +18,59 @@ ProductController.get('/',
     async (req, res) => {
         const {page, limit, categories} = req.query
 
-        const aggregate = await ProductModel.aggregate()
+        const aggregate =  ProductModel.aggregate()
             .lookup({
-                from: 'prices', localField: '_id', foreignField: 'product', as: 'prices',
-
+                from: 'prices',
+                localField: '_id',
+                foreignField: 'product',
+                as: 'prices',
+                let:{
+                    price: "$price",
+                    discount: "$discount"
+                },
                 pipeline:[
                     {
+                        $match:{
+                            status: {
+                                $in: ["in-stock"]
+                            }
+                        }
+                    },
+                    {
+                        $addFields: {
+                            "sellPrice": {
+                                $cond:[
+                                    {$ifNull: [ "$discount", 0 ]},
+                                    "$discount",
+                                    "$price",
+                                ]
+                            }
+                        }
+                    },
+                    {
                         $sort:{
-                            price: -1
+                            sellPrice: 1
                         }
                     }
                 ]
+
             })
-        console.log({aggregate})
+
+
+       const awsd = await   aggregate.project({
+            _id: 1,
+            title: 1,
+            code:1,
+            colors: 1,
+            sizes:1,
+            status: 1,
+            description: 1,
+            categories: 1,
+            images:1,
+            tags:1,
+            price:{$arrayElemAt: ["$prices",0]}
+        })
+        console.log({awsd})
         let query = ProductService.getProducts().where({status: 'show'})
 
         if (categories) {
