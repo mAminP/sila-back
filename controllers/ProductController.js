@@ -17,20 +17,26 @@ ProductController.get('/',
     validator.query(ProductFilterQuerySchema),
     async (req, res) => {
         const {page, limit, categories} = req.query
+        const count = 3;
+        const aggregate = []
 
-        const aggregate =  ProductModel.aggregate()
-            .lookup({
+        aggregate.push({
+            $match: {status: 'show'}
+        })
+
+        aggregate.push({
+            $lookup: {
                 from: 'prices',
                 localField: '_id',
                 foreignField: 'product',
                 as: 'prices',
-                let:{
+                let: {
                     price: "$price",
                     discount: "$discount"
                 },
-                pipeline:[
+                pipeline: [
                     {
-                        $match:{
+                        $match: {
                             status: {
                                 $in: ["in-stock"]
                             }
@@ -39,8 +45,8 @@ ProductController.get('/',
                     {
                         $addFields: {
                             "sellPrice": {
-                                $cond:[
-                                    {$ifNull: [ "$discount", 0 ]},
+                                $cond: [
+                                    {$ifNull: ["$discount", 0]},
                                     "$discount",
                                     "$price",
                                 ]
@@ -48,45 +54,49 @@ ProductController.get('/',
                         }
                     },
                     {
-                        $sort:{
+                        $sort: {
                             sellPrice: 1
                         }
                     }
                 ]
 
-            })
-
-
-       const awsd = await   aggregate.project({
-            _id: 1,
-            title: 1,
-            code:1,
-            colors: 1,
-            sizes:1,
-            status: 1,
-            description: 1,
-            categories: 1,
-            images:1,
-            tags:1,
-            price:{$arrayElemAt: ["$prices",0]}
+            }
         })
-        console.log({awsd})
-        let query = ProductService.getProducts().where({status: 'show'})
 
         if (categories) {
-            query = query.where({
-                categories: {
-                    $in: categories
-                }
+            console.log(categories)
+            aggregate.push({
+
             })
         }
-        query = query
-            .populate({path: 'categories', populate: 'category'})
 
-        const countQuery = ProductService.getProducts().merge(query)
-        const count = await countQuery.count()
+        aggregate.push(
+            {
+                $skip: ((page - 1) * limit),
 
-        const products = await query.skip((page - 1) * limit).limit(limit)
+            },
+            {
+                $limit: limit
+            }
+        )
+
+        aggregate.push({
+            $project: {
+                _id: 1,
+                title: 1,
+                code: 1,
+                colors: 1,
+                sizes: 1,
+                status: 1,
+                description: 1,
+                categories: 1,
+                images: 1,
+                tags: 1,
+                price: {$arrayElemAt: ["$prices", 0]}
+            }
+        })
+        const products = await ProductModel.aggregate(aggregate)
+
         return res.send(new PaginateItems(page, limit, count, products))
     })
 
